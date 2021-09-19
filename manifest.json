@@ -1,0 +1,10 @@
+{
+	"id": "dehowell-obsidian-scaffold",
+	"name": "Scaffold",
+	"version": "1.0.1",
+	"minAppVersion": "0.9.12",
+	"description": "Personal grab-bag of scaffolding for personal Obsidian use.",
+	"author": "David Howell",
+	"authorUrl": "https://www.tildeish.com/",
+	"isDesktopOnly": false
+}
