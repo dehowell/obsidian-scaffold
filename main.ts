@@ -10,8 +10,10 @@ export default class DaveScaffoldingPlugin extends Plugin {
 			},
 			editorCallback: (editor, view) => {
 				let content = editor.getValue();
+				let position = editor.getCursor();
 				let trimmedContent = content.replace(/ +$/gm, "");
 				editor.setValue(trimmedContent);
+				editor.setCursor(position);
 			}
 		});
 	}
