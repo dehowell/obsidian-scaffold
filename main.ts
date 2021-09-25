@@ -6,14 +6,27 @@ export default class DaveScaffoldingPlugin extends Plugin {
 		this.addCommand({
 			id: 'trim-trailing-whitespace',
 			name: 'Trim Trailing Whitespace',
-			callback: () => {
-				console.log("foo");
-			},
+			callback: () => {},
 			editorCallback: (editor, view) => {
 				let content = editor.getValue();
 				let position = editor.getCursor();
 				let trimmedContent = content.replace(/ +$/gm, "");
 				editor.setValue(trimmedContent);
+				editor.setCursor(position);
+			}
+		});
+
+		this.addCommand({
+			id: 'replace-smart-punctuation',
+			name: 'Make Punctuation Dumb',
+			callback: () => {},
+			editorCallback: (editor, view) => {
+				let position = editor.getCursor();
+				let content = editor.getValue();
+				let newContent = content
+					.replace(/‘|’/g, "'")
+					.replace(/(“|”)/g, "\"");
+				editor.setValue(newContent);
 				editor.setCursor(position);
 			}
 		});
