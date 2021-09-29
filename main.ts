@@ -4,6 +4,23 @@ const BEAR_TITLE_LINE = /^\["(?<title>.*?)", (?<author>.*?), (?<publication>.*?)
 export default class DaveScaffoldingPlugin extends Plugin {
 	async onload() {
 		this.addCommand({
+			id: 'paste-as-blockquote',
+			name: 'Paste as Blockquote',
+			hotkeys: [{'modifiers': ['Ctrl', 'Mod'], 'key': 'v'}],
+			callback: () => {},
+			editorCallback: async (editor, view) => {
+				// get contents of clipboard
+				let clipboard = await navigator.clipboard.readText();
+
+				// format as blockquote plus hr
+				let blockquote = `> ${clipboard}\n\n---\n`
+
+				// insert text
+				editor.replaceSelection(blockquote);
+			}
+		});
+
+		this.addCommand({
 			id: 'trim-trailing-whitespace',
 			name: 'Trim Trailing Whitespace',
 			callback: () => {},
