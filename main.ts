@@ -65,13 +65,27 @@ export default class DaveScaffoldingPlugin extends Plugin {
 						`# [${match.groups.title}](${match.groups.url})`,
 						match.groups.author,
 						match.groups.publication,
-						`#refnote #type/literature/article`,
+						`#ref/article`,
 						rest
 					].join("\n");
 
 					editor.setValue(newContent);
 					editor.setCursor(position);
 				}
+			}
+		});
+
+		this.addCommand({
+			id: 'find-in-devonthink',
+			name: 'Find in DEVONthink',
+			callback: () => {},
+			editorCallback: (editor, view) => {
+				// find the first URL in doc OR the URL under the cursor
+				let url = "https://www.ribbonfarm.com/2018/07/13/hedonic-audit/";
+				// construct DEVONthink search URL
+				`x-devonthink://search?query=url:${url}`
+				// open the DEVONthink URL
+				// ?
 			}
 		});
 	}
