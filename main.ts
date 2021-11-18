@@ -62,16 +62,37 @@ export default class DaveScaffoldingPlugin extends Plugin {
 				let match = firstLine.match(BEAR_TITLE_LINE);
 				if (match) {
 					let newContent = [
+						'---',
+						'tags: ref/article',
+						'---',
 						`# [${match.groups.title}](${match.groups.url})`,
 						match.groups.author,
 						match.groups.publication,
-						`#ref/article`,
 						rest
 					].join("\n");
 
 					editor.setValue(newContent);
 					editor.setCursor(position);
 				}
+			}
+		});
+
+		this.addCommand({
+			id: 'standardize-frontmatter',
+			name: 'Standardize Frontmatter',
+			callback: () => {},
+			editorCallback: (editor, view) => {
+				let metadata = this.app.metadataCache.getFileCache(view.file);
+				if (metadata.frontmatter) {
+					// find position of tags frontmatter field
+				} else {
+					// create tags frontmatter field
+				}
+
+				if (metadata.tags) {
+					// write these tags to the frontmatter
+					// delete them from text
+				} 
 			}
 		});
 
