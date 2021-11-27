@@ -100,12 +100,12 @@ export default class DaveScaffoldingPlugin extends Plugin {
 			name: 'Find in DEVONthink',
 			callback: () => {},
 			editorCallback: (editor, view) => {
-				// find the first URL in doc OR the URL under the cursor
+				// TODO find the first URL in doc OR the URL under the cursor
 				let url = "https://www.ribbonfarm.com/2018/07/13/hedonic-audit/";
 				// construct DEVONthink search URL
-				`x-devonthink://search?query=url:${url}`
+				let dtUrl = `x-devonthink://search?query=url:${url}`;
 				// open the DEVONthink URL
-				// ?
+				open(dtUrl);
 			}
 		});
 	}
