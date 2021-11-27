@@ -1,5 +1,19 @@
 import { Plugin } from 'obsidian';
 
+function trimTrailingWhitespace(content: string): string {
+	return content.replace(/ +$/gm, "");;
+}
+
+function makePunctuationDumb(content: string): string {
+	return content
+		.replace(/‘|’/g, "'")
+		.replace(/(“|”)/g, "\"");
+}
+
+function standardizeText(content: string): string {
+	return trimTrailingWhitespace(makePunctuationDumb(content));
+}
+
 const BEAR_TITLE_LINE = /^\["(?<title>.*?)", (?<author>.*?), (?<publication>.*?)\]\((?<url>.*?)\)$/;
 export default class DaveScaffoldingPlugin extends Plugin {
 	async onload() {
@@ -21,40 +35,25 @@ export default class DaveScaffoldingPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'trim-trailing-whitespace',
-			name: 'Trim Trailing Whitespace',
+			id: 'standarize-text',
+			name: 'Standardize Text',
 			callback: () => {},
 			editorCallback: (editor, view) => {
 				let content = editor.getValue();
 				let position = editor.getCursor();
-				let trimmedContent = content.replace(/ +$/gm, "");
-				editor.setValue(trimmedContent);
+				let standardized = standardizeText(content);
+				editor.setValue(standardized);
 				editor.setCursor(position);
 			}
 		});
 
 		this.addCommand({
-			id: 'replace-smart-punctuation',
-			name: 'Make Punctuation Dumb',
+			id: 'reformat-bear-note',
+			name: 'Reformat Bear Note',
 			callback: () => {},
 			editorCallback: (editor, view) => {
 				let position = editor.getCursor();
-				let content = editor.getValue();
-				let newContent = content
-					.replace(/‘|’/g, "'")
-					.replace(/(“|”)/g, "\"");
-				editor.setValue(newContent);
-				editor.setCursor(position);
-			}
-		});
-
-		this.addCommand({
-			id: 'reformat-bear-title-line',
-			name: 'Reformat Bear Title Line',
-			callback: () => {},
-			editorCallback: (editor, view) => {
-				let position = editor.getCursor();
-				let content = editor.getValue();
+				let content = standardizeText(editor.getValue());
 				let lines = content.split("\n");
 				let firstLine = lines.shift();
 				let rest = lines.join("\n");
