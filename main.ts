@@ -1,5 +1,8 @@
 import { Plugin } from 'obsidian';
 
+const MARKDOWN_LINK = /\[(?<linktext>.*?)\]\((?<url>.*?)\)/;
+const BEAR_TITLE_LINE = /^\["(?<title>.*?)", (?<author>.*?), (?<publication>.*?)\]\((?<url>.*?)\)$/;
+
 function trimTrailingWhitespace(content: string): string {
 	return content.replace(/ +$/gm, "");;
 }
@@ -14,7 +17,15 @@ function standardizeText(content: string): string {
 	return trimTrailingWhitespace(makePunctuationDumb(content));
 }
 
-const BEAR_TITLE_LINE = /^\["(?<title>.*?)", (?<author>.*?), (?<publication>.*?)\]\((?<url>.*?)\)$/;
+function findFirstLink(content: string): string {
+	let match = content.match(MARKDOWN_LINK);
+	if (match) {
+		return match.groups['url'];
+	} else {
+		return undefined;
+	}
+}
+
 export default class DaveScaffoldingPlugin extends Plugin {
 	async onload() {
 		this.addCommand({
@@ -100,12 +111,66 @@ export default class DaveScaffoldingPlugin extends Plugin {
 			name: 'Find in DEVONthink',
 			callback: () => {},
 			editorCallback: (editor, view) => {
-				// TODO find the first URL in doc OR the URL under the cursor
-				let url = "https://www.ribbonfarm.com/2018/07/13/hedonic-audit/";
-				// construct DEVONthink search URL
-				let dtUrl = `x-devonthink://search?query=url:${url}`;
-				// open the DEVONthink URL
-				open(dtUrl);
+				let url = findFirstLink(editor.getValue());
+				if (url) {
+					// construct DEVONthink search URL
+					let dtUrl = `x-devonthink://search?query=url:${url}`;
+					// open the DEVONthink URL
+					open(dtUrl);
+				}	
+			}
+		});
+
+		this.addCommand({
+			id: 'move-tags-to-heading',
+			name: 'Move tags to heading',
+			callback: () => {},
+			editorCallback: (editor, view) => {
+				/**
+				 * Moves the contents of the `tags` frontmatter field to just below 
+				 * the heading (i.e. first block of text in the document).
+				 */
+				
+				// Does this file have any tags in the frontmatter?
+				let metadata = this.app.metadataCache.getFileCache(view.file);
+				if (metadata.frontmatter && metadata.frontmatter.tags) {
+					// construct string of inline tags
+					let tags = metadata.frontmatter.tags;
+					let inlineTags = tags.split(" ")
+						.map((s: string) => "#"+s)
+						.join(" ") + "\n";
+
+					// remember the cursor position to restore it after edits
+					let cursor = editor.getCursor();
+
+					// insert the tag string below the heading
+					let content = editor.getValue();
+					let endOfHeadingPosition = editor.offsetToPos(content.search(/(?<=\n)\n/));
+					editor.replaceRange(inlineTags, endOfHeadingPosition, endOfHeadingPosition);
+
+					// remove tags from frontmatter
+					let excluded = new Set(["tags", "position"]);
+					let otherFields = Object.keys(metadata.frontmatter)
+						.filter((s: string) => !excluded.has(s));
+					if (otherFields.length == 0) {
+						// remove the frontmatter if nothing else is there but tags field
+						let frontmatter = metadata.frontmatter.position;
+						editor.replaceRange("",
+							editor.offsetToPos(frontmatter.start.offset),
+							editor.offsetToPos(frontmatter.end.offset));
+					} else {
+						// just remove the tags field
+						let match = content.match(/tags: .*?\n/);
+						if (match) {
+							let tagsStart = editor.offsetToPos(match.index);
+							let tagsEnd = editor.offsetToPos(match.index + match[0].length);
+							editor.replaceRange("", tagsStart, tagsEnd);
+						}
+					}
+
+					// reset the cursor
+					editor.setCursor(cursor);
+				}
 			}
 		});
 	}
