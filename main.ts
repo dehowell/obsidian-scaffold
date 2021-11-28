@@ -88,25 +88,6 @@ export default class DaveScaffoldingPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'standardize-frontmatter',
-			name: 'Standardize Frontmatter',
-			callback: () => {},
-			editorCallback: (editor, view) => {
-				let metadata = this.app.metadataCache.getFileCache(view.file);
-				if (metadata.frontmatter) {
-					// find position of tags frontmatter field
-				} else {
-					// create tags frontmatter field
-				}
-
-				if (metadata.tags) {
-					// write these tags to the frontmatter
-					// delete them from text
-				} 
-			}
-		});
-
-		this.addCommand({
 			id: 'find-in-devonthink',
 			name: 'Find in DEVONthink',
 			callback: () => {},
