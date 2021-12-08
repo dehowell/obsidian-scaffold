@@ -72,12 +72,10 @@ export default class DaveScaffoldingPlugin extends Plugin {
 				let match = firstLine.match(BEAR_TITLE_LINE);
 				if (match) {
 					let newContent = [
-						'---',
-						'tags: ref/article',
-						'---',
 						`# [${match.groups.title}](${match.groups.url})`,
 						match.groups.author,
 						match.groups.publication,
+						"#ref/article",
 						rest
 					].join("\n");
 
