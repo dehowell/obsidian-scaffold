@@ -101,6 +101,34 @@ export default class DaveScaffoldingPlugin extends Plugin {
 		});
 
 		this.addCommand({
+			id: 'open-in-omnifocus',
+			name: 'Find note as OmniFocus project',
+			checkCallback: (checking: boolean) => {
+				let activeFile = this.app.workspace.getActiveFile();
+				let metadata = this.app.metadataCache.getFileCache(activeFile);
+				let isProjectNote = metadata.tags?.findIndex(t => t.tag == "#project") > -1;
+				if (checking) return isProjectNote;
+
+				let script = `argument.forEach(arg => {
+					let match = projectsMatching(arg);
+					if (match.length > 0) {
+						let project = match[0];
+						let key = project.id.primaryKey;
+						let url = URL.fromString("omnifocus://task/" + key);
+						url.open();
+					} else {
+						// not found, create from scratch?
+					}
+				})`
+
+				let encodedScript = encodeURIComponent(script);
+				let arg = encodeURIComponent(JSON.stringify([activeFile.basename]));
+				let scriptUrl = `omnifocus://localhost/omnijs-run?script=${encodedScript}&arg=${arg}`;
+				open(scriptUrl);
+			}
+		});
+
+		this.addCommand({
 			id: 'move-tags-to-heading',
 			name: 'Move tags to heading',
 			callback: () => {},
